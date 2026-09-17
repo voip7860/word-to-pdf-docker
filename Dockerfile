@@ -1,8 +1,12 @@
 FROM python:3.10-slim
 
-# Install LibreOffice and dependencies
+# Install LibreOffice, fonts, and dependencies required for headless conversion
 RUN apt-get update && apt-get install -y \
     libreoffice \
+    libreoffice-writer \
+    fonts-dejavu \
+    fonts-liberation \
+    fontconfig \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
