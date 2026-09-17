@@ -1,15 +1,12 @@
 FROM python:3.10-slim
 
-# Automatically accept Microsoft EULA for fonts installation
-RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula boolean true" | debconf-set-selections
-
-# Install LibreOffice, Java, and Microsoft Core Fonts for exact layout matching
+# Install LibreOffice and clean standard fonts without interactive prompts
 RUN apt-get update && apt-get install -y \
     libreoffice \
     default-jre \
     fontconfig \
-    ttf-mscorefonts-installer \
     fonts-liberation \
+    fonts-dejavu \
     && fc-cache -f -v \
     && rm -rf /var/lib/apt/lists/*
 
