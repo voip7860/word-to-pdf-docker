@@ -27,12 +27,12 @@ def convert_word_to_pdf():
         
         file.save(docx_path)
         
-        # Step 1: Convert Word (.docx) to clean HTML using mammoth
+        # Convert Word (.docx) to clean HTML using mammoth
         with open(docx_path, "rb") as docx_file:
             result_mammoth = mammoth.convert_to_html(docx_file)
             html_content = result_mammoth.value
             
-        # Add professional CSS styling to preserve table layout, borders, and margins exactly like Word
+        # Professional CSS styling to keep table layouts and borders exact
         styled_html = f"""
         <!DOCTYPE html>
         <html>
@@ -41,7 +41,7 @@ def convert_word_to_pdf():
             <style>
                 body {{
                     font-family: Arial, sans-serif;
-                    margin: 20px;
+                    margin: 15px;
                     color: #000;
                     line-height: 1.4;
                 }}
@@ -69,7 +69,6 @@ def convert_word_to_pdf():
         </html>
         """
         
-        # Step 2: Convert HTML to PDF using pdfkit (wkhtmltopdf) for crisp, perfect multi-page alignment
         options = {
             'page-size': 'A4',
             'margin-top': '10mm',
