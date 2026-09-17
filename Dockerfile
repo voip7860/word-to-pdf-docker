@@ -1,9 +1,10 @@
 FROM python:3.10-slim
 
-# Install LibreOffice and Java for reliable document conversion
+# Install LibreOffice and essential fonts for proper table rendering
 RUN apt-get update && apt-get install -y \
     libreoffice \
     default-jre \
+    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
