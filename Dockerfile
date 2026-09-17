@@ -1,12 +1,16 @@
 FROM python:3.10-slim
 
-# Install wkhtmltopdf and system dependencies for perfect rendering
+# Install system dependencies required for PDF rendering engines
 RUN apt-get update && apt-get install -y \
     wkhtmltopdf \
     fontconfig \
     libfontconfig1 \
     libxrender1 \
     libxtst6 \
+    libssl-dev \
+    libx11-6 \
+    libxcb1 \
+    libxext6 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
