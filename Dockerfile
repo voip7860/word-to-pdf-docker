@@ -1,12 +1,12 @@
 FROM python:3.10-slim
 
-# Install LibreOffice, fonts, and dependencies required for headless conversion
+# Install wkhtmltopdf and system dependencies for perfect rendering
 RUN apt-get update && apt-get install -y \
-    libreoffice \
-    libreoffice-writer \
-    fonts-dejavu \
-    fonts-liberation \
+    wkhtmltopdf \
     fontconfig \
+    libfontconfig1 \
+    libxrender1 \
+    libxtst6 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
