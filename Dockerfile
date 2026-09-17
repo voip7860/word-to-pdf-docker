@@ -1,20 +1,4 @@
-FROM python:3.10-slim
+FROM gotenberg/gotenberg:8
 
-# Install LibreOffice and clean standard fonts without interactive prompts
-RUN apt-get update && apt-get install -y \
-    libreoffice \
-    default-jre \
-    fontconfig \
-    fonts-liberation \
-    fonts-dejavu \
-    && fc-cache -f -v \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-CMD gunicorn --bind 0.0.0.0:$PORT app:app --workers 1 --threads 8 --timeout 120
+ENV GOTENBERG_LOG_LEVEL=info
+EXPOSE 3000
