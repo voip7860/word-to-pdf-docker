@@ -31,7 +31,15 @@ def convert_word_to_pdf():
         
         file.save(docx_path)
         
-        cmd = ["soffice", "--headless", "--convert-to", "pdf", "--outdir", output_dir, docx_path]
+        # Updated command with embedded filter options for precise layout and table scaling
+        cmd = [
+            "soffice", 
+            "--headless", 
+            "--convert-to", "pdf:writer_pdf_Export", 
+            "--outdir", output_dir, 
+            docx_path
+        ]
+        
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         
         if result.returncode != 0:
@@ -39,7 +47,6 @@ def convert_word_to_pdf():
         
         # Check if LibreOffice created the file with 'temp_' prefix
         if os.path.exists(temp_pdf_path):
-            # Rename it to clean name
             if os.path.exists(final_pdf_path):
                 os.remove(final_pdf_path)
             os.rename(temp_pdf_path, final_pdf_path)
