@@ -1,6 +1,7 @@
 import os
 import json
 from flask import Flask, request, send_file
+from flask_cors import CORS
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
@@ -8,8 +9,8 @@ import io
 import traceback
 
 app = Flask(__name__)
+CORS(app)
 
-# Google Drive Setup
 SCOPES = ['https://www.googleapis.com/auth/drive']
 FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID')
 
@@ -18,7 +19,6 @@ def convert_word_to_pdf_gdrive(docx_path, output_pdf_path):
     creds = service_account.Credentials.from_service_account_info(creds_json, scopes=SCOPES)
     drive_service = build('drive', 'v3', credentials=creds)
 
-    # 1. Upload Word file to Google Drive
     file_metadata = {
         'name': 'temp_docx_file',
         'parents': [FOLDER_ID],
@@ -35,7 +35,6 @@ def convert_word_to_pdf_gdrive(docx_path, output_pdf_path):
     file_id = uploaded_file.get('id')
 
     try:
-        # 2. Download as PDF format
         request_drive = drive_service.files().export_media(fileId=file_id, mimeType='application/pdf')
         fh = io.BytesIO()
         downloader = MediaIoBaseDownload(fh, request_drive)
@@ -48,10 +47,8 @@ def convert_word_to_pdf_gdrive(docx_path, output_pdf_path):
             f.write(fh.getvalue())
 
     finally:
-        # 3. Delete temporary file from drive
         drive_service.files().delete(fileId=file_id).execute()
 
-# Home page route
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -65,18 +62,17 @@ def index():
         if file:
             input_path = 'temp.docx'
             output_path = 'output.pdf'
-            
             file.save(input_path)
             
             try:
-                # Call Google Drive conversion function
                 convert_word_to_pdf_gdrive(input_path, output_path)
                 return send_file(output_path, as_attachment=True, download_name='converted.pdf')
             except Exception as e:
-                error_details = traceback.format_exc()
+                tb = traceback.format_exc()
+                api_content = getattr(e, 'content', b'').decode('utf-8', errors='ignore')
                 return f'''
-                <h3 style="color: red;">An error occurred during conversion:</h3>
-                <pre style="background: #f8f9fa; padding: 15px; border: 1px solid #ccc;">{error_details}</pre>
+                <h3 style="color: red;">Google Drive API Error Details:</h3>
+                <pre style="background: #f8f9fa; padding: 15px; border: 1px solid #ccc; white-space: pre-wrap;">{tb}\n\nGoogle API Response:\n{api_content}</pre>
                 <br><a href="/">Go Back</a>
                 ''', 500
             finally:
