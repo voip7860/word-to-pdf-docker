@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS
 
 # Hardcoded CloudConvert API Key
-CLOUDCONVERT_API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiYmU0NGRmMDAyMTA5NzBmNGE3NjNhOWM0Y2JlZWFhMGMwMzAzYTlkZjRkNDNmZjkyZjc2NmZiMGUyZmM2OWQ3ZGE0NjczNmFkZTFjYmNmYjAiLCJpYXQiOjE3ODk2Nzg0NjEuNzg0NzM4LCJuYmYiOjE3ODk2Nzg0NjEuNzg0NzQsImV4cCI6NDk0NTM1MjA2MS43NzY1MjgsInN1YiI6Ijc3MDA4MTE0Iiwic2NvcGVzIjpbInVzZXIucmVhZCIsInRhc2kucmVhZCIsInRhc2sud3JpdGUiXX0.mSMkmQcjm8Oucq7uZFUrIOiEzCQC8aONun43w_m9EU_I4R3e0MtnenZNpvGLM4QrmPTr3R5Eps9FR8KCkE45dD4ckZeYmZdvVMS11TIDPsZqaC4AUYByNcfNCzvw1rOC7BcIXid5FEO4g9KKvHX68_w0qrpaflQBpSBIgxCWM8iagtB8plt1juw5Zqy8agLwAdZ8nXjWs36HrJN6r58CcjmGH4QScZrxpl37XWldVLZYxFuTSTjSXfus_zice-0nTnK9wq0wwGmdi6fDXhaDTsUrl1U-topF14mzJjAHIXUG6_VhRn0z1BHT-mWvZwwhv64EhLBq7mWC2KQ8p2BP_NkvNJpLdxzK-Gme3rnIAejW6uiL497LRXZxOIrsR9noiKrmd3F7xvdiO5w8s4CuJQpJXUwKOo7eQ863NeIrOfZDen_Ii22-Gzab-yL_fytFhGpdJxbMdkZDywkOpABvGLAViHWjjKybTh8ieCizxBSmfmLb8yjVCROmZ-hzkjr1KI6jNlk-6YAMli4zl2PuifupG-IULluVb49i-1b2mJJCw6Y7jzymDT4ZVDNDhGe2kdnt8MQhOh8zxV6rgvhS5ZQO6bSAXBv5eM4j6vvg5AC60Snwi7vglBapr9X7fz9OpmhanSKD0GrDMZ9DQcXKT4sQgPVncajNmrXxtmjj_1Q"
+CLOUDCONVERT_API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiYmU0NGRmMDAyMTA5NzBmNGE3NjNhOWM0Y2JlZWFhMGMwMzAzYTlkZjRkNDNmZjkyZjc2NmZiMGUyZmM2OWQ3ZGE0NjczNmFkZTFjYmNmYjAiLCJpYXQiOjE3ODk2Nzg0NjEuNzg0NzM4LCJuYmYiOjE3ODk2Nzg0NjEuNzg0NzQsImV4cCI6NDk0NTM1MjA2MS43NzY1MjgsInN1YiI6Ijc3MDA4MTE0Iiwic2NvcGVzIjpbInVzZXIucmVhZCIsInRhc2kucmVhZCIsInRhc2sud3JitelXRlswLmltU21rbVFjam04T3VjcXd1WkZVcklPaUV6Q1FDOGFPTnVuNDN3X205RVVfSTRSM2UwTWRuZW5aPnB2R0xNNFFybVBUcjNSNEVwczlGUjhLQ2tFNDVkRDRja1plWW1aZHZWTVMxMVRJRFBzWnFhQzRBVVlCeU5jZk5DelZ3MWxPQzdCY0lYaWQ5RkVPNGc5S0t2SFg2OF93MHFycGFmbFFCcFNCSWd4Q1dNOGlhZ3RCOXBsdDFqdXc1WnF5OGFnTHdBZaDo4bnhqV3MzNkhySk42cjU4Q2NqbUdocVFTcFpyenhwbDM3WFdsZGxOWll4RnVUU1RqU1hmdXNfemljZS0wblRuSzl3cTAwd0dtZGk2ZlRYaGFEVHNVcmwxVS10b3BGMTRtempqQUhJWFVHNl9WaFJuMHoxQlhULW1Xdlp3d2h2NjRFaExCcTdtV0MyS1E4cDJCUE5LdnBKcExkeHpLLUdtZTNybklBRWpXNnVpTDQ5N0xSWlh4T0lyc1I5bm9pS3JtZDNGN3h2ZGlPNXc4c0N1SlFwbkpYV19LT283ZVE4NjNOZUlyT2ZaRGVuX0lpMjItR2phYi15TF9meXRGaEdwZHNqYk1ka1pEeXdrT3BBQnZHTEFWaUhXamtLeWJUaDhpZUNpenhCU21mbUxiOHlqVkNST21aLWh6a2pyMUFLNmpObGstNllBTWxpNHpsMlB1aWZ1cEctSVVMbHVWcjQ5aS0xYjJtSkpDdzZZN2p6eW1EVDRaVkROREhHZTIrZG50OE1RaEg4enhWZ3ZoUzVaUU82YlNBWEJ2NWVNNGo2dnZnQUM2MFNud2k3dmdsQmFwcjlYN2Z6OU9wbWhhblNLRDBHckRNWjBEUXNLVDRzUWdQVm5jYWpNblJYeHRtbWpqXzFR"
 
 cloudconvert.configure(api_key=CLOUDCONVERT_API_KEY, sandbox=False)
 
@@ -47,14 +47,32 @@ def convert_word():
                 }
             })
 
-            upload_task_id = job['result'][0]['id']
-            upload_task = cloudconvert.Task.find(id=upload_task_id)
-            
+            # Safely extract tasks from job response
+            job_id = job.get('id') or job.get('data', {}).get('id')
+            tasks = job.get('tasks', [])
+            if not tasks and 'data' in job:
+                tasks = job['data'].get('tasks', [])
+
+            upload_task = None
+            for task in tasks:
+                if task.get('name') == 'import-1':
+                    upload_task = task
+                    break
+
+            if not upload_task:
+                return "Error: Upload task not found in CloudConvert response.", 500
+
             with open(input_path, 'rb') as f:
                 cloudconvert.Task.upload(upload_task=upload_task, file_object=f)
 
-            job = cloudconvert.Job.wait(id=job['id'])
-            export_task = [task for task in job['tasks'] if task['name'] == 'export-1'][0]
+            # Wait for job completion
+            job = cloudconvert.Job.wait(id=job_id)
+
+            job_tasks = job.get('tasks', [])
+            if not job_tasks and 'data' in job:
+                job_tasks = job['data'].get('tasks', [])
+
+            export_task = [task for task in job_tasks if task.get('name') == 'export-1'][0]
             file_url = export_task['result']['files'][0]['url']
             
             urllib.request.urlretrieve(file_url, output_path)
@@ -66,9 +84,7 @@ def convert_word():
             return f'Conversion Error:\n{error_details}', 500
         finally:
             if os.path.exists(input_path):
-                os.path.exists(input_path)
-                if os.path.exists(output_path):
-                    pass # Keep output until sent or let Flask handle cleanup
+                os.remove(input_path)
 
 @app.route('/', methods=['GET'])
 def index():
