@@ -12,16 +12,35 @@ app = Flask(__name__)
 CORS(app)
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
-FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID')
+
+def get_or_create_drive_folder(drive_service):
+    # گوگل ڈرائیو میں خودکار طریقے سے 'WordToPDF' فولڈر تلاش کریں
+    query = "name='WordToPDF' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+    response = drive_service.files().list(q=query, spaces='drive', fields='files(id, name)').execute()
+    files = response.get('files', [])
+    
+    if files:
+        return files[0]['id']
+    else:
+        # اگر فولڈر نہ ملے تو خود بخود نیا بنا لے
+        file_metadata = {
+            'name': 'WordToPDF',
+            'mimeType': 'application/vnd.google-apps.folder'
+        }
+        folder = drive_service.files().create(body=file_metadata, fields='id').execute()
+        return folder.get('id')
 
 def convert_word_to_pdf_gdrive(docx_path, output_pdf_path):
     creds_json = json.loads(os.environ.get('GOOGLE_CREDENTIALS_JSON'))
     creds = service_account.Credentials.from_service_account_info(creds_json, scopes=SCOPES)
     drive_service = build('drive', 'v3', credentials=creds)
 
+    # فولڈر آئی ڈی خود بخود حاصل کریں (اب Render میں آئی ڈی دینے کی ضرورت نہیں)
+    folder_id = get_or_create_drive_folder(drive_service)
+
     file_metadata = {
         'name': 'temp_docx_file',
-        'parents': [FOLDER_ID],
+        'parents': [folder_id],
         'mimeType': 'application/vnd.google-apps.document'
     }
     media = MediaFileUpload(docx_path, mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document', resumable=True)
