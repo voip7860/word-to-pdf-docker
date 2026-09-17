@@ -22,17 +22,10 @@ def convert_word_to_pdf():
         docx_path = os.path.join("/tmp", f"{safe_filename_base}.docx")
         file.save(docx_path)
         
-        # Convert directly using optimized headless engine
+        # Binary name fixed to 'soffice' for Linux LibreOffice CLI
         cmd = [
-            "libreoffice",
+            "soffice",
             "--headless",
-            "--invisible",
-            "--nocrashdump",
-            "--nodefault",
-            "--nofirststartwizard",
-            "--nolockcheck",
-            "--nologo",
-            "--norestore",
             "--convert-to", "pdf",
             "--outdir", "/tmp",
             docx_path
@@ -40,13 +33,12 @@ def convert_word_to_pdf():
         
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=90)
         
-        pdf_filename = f"{safe_filename_base}.pdf"
-        pdf_path = os.path.join("/tmp", pdf_filename)
+        pdf_path = os.path.join("/tmp", f"{safe_filename_base}.pdf")
         
         if os.path.exists(pdf_path):
             return send_file(pdf_path, as_attachment=True, download_name=f"{filename_base}.pdf")
         else:
-            return f"Conversion failed: {result.stderr}", 500
+            return f"Conversion failed STDOUT: {result.stdout} STDERR: {result.stderr}", 500
             
     except Exception as e:
         return f"Server Error: {str(e)}\n{traceback.format_exc()}", 500
