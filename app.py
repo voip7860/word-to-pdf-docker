@@ -1,7 +1,6 @@
 import os
 import subprocess
 import traceback
-from docx import Document
 from flask import Flask, request, send_file
 from flask_cors import CORS
 
@@ -30,21 +29,14 @@ def convert_word_to_pdf():
         
         file.save(docx_path)
         
-        # Pre-process docx using python-docx to optimize tables for rendering
-        try:
-            doc = Document(docx_path)
-            for table in doc.tables:
-                table.autofit = False
-            doc.save(docx_path)
-        except Exception as doc_err:
-            print(f"Docx pre-processing note: {doc_err}")
-
-        # Convert using LibreOffice
+        # Strict headless conversion with parameters to prevent layout shifting
         cmd = [
-            "soffice", 
-            "--headless", 
-            "--convert-to", "pdf:writer_pdf_Export", 
-            "--outdir", output_dir, 
+            "soffice",
+            "--headless",
+            "--convert-to",
+            "pdf:writer_pdf_Export",
+            "--outdir",
+            output_dir,
             docx_path
         ]
         
