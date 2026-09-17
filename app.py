@@ -1,13 +1,11 @@
 import os
-import requests
+import subprocess
 import traceback
 from flask import Flask, request, send_file
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-
-GOTENBERG_URL = "http://localhost:3000/forms/libreoffice/convert"
 
 @app.route('/convert-word', methods=['POST'])
 def convert_word_to_pdf():
@@ -21,24 +19,38 @@ def convert_word_to_pdf():
         filename_base = os.path.splitext(file.filename)[0]
         safe_filename_base = "".join([c if c.isalnum() else "_" for c in filename_base])
         
-        docx_path = f"/tmp/{safe_filename_base}.docx"
-        pdf_path = f"/tmp/{safe_filename_base}.pdf"
+        docx_path = os.path.join("/tmp", f"{safe_filename_base}.docx")
         file.save(docx_path)
-
-        with open(docx_path, 'rb') as f:
-            files = {'files': (f"{safe_filename_base}.docx", f)}
-            response = requests.post(GOTENBERG_URL, files=files, timeout=120)
-
-        if response.status_code == 200:
-            with open(pdf_path, 'wb') as f_out:
-                f_out.write(response.content)
+        
+        # Convert directly using optimized headless engine
+        cmd = [
+            "libreoffice",
+            "--headless",
+            "--invisible",
+            "--nocrashdump",
+            "--nodefault",
+            "--nofirststartwizard",
+            "--nolockcheck",
+            "--nologo",
+            "--norestore",
+            "--convert-to", "pdf",
+            "--outdir", "/tmp",
+            docx_path
+        ]
+        
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=90)
+        
+        pdf_filename = f"{safe_filename_base}.pdf"
+        pdf_path = os.path.join("/tmp", pdf_filename)
+        
+        if os.path.exists(pdf_path):
             return send_file(pdf_path, as_attachment=True, download_name=f"{filename_base}.pdf")
         else:
-            return f"Gotenberg Error: {response.text}", 500
-
+            return f"Conversion failed: {result.stderr}", 500
+            
     except Exception as e:
-        return f"Conversion Error: {str(e)}\n{traceback.format_exc()}", 500
-
+        return f"Server Error: {str(e)}\n{traceback.format_exc()}", 500
+        
     finally:
         if docx_path and os.path.exists(docx_path):
             try:
