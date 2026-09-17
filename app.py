@@ -11,6 +11,7 @@ CORS(app)
 def convert_word_to_pdf():
     docx_path = None
     pdf_path = None
+    temp_pdf_path = None
     try:
         if 'file' not in request.files:
             return 'No file uploaded', 400
@@ -20,9 +21,13 @@ def convert_word_to_pdf():
         # Clean the base filename to avoid spaces/special char issues in linux shell
         safe_filename_base = "".join([c if c.isalnum() else "_" for c in filename_base])
         
-        docx_path = f"temp_{safe_filename_base}.docx"
+        docx_filename = f"temp_{safe_filename_base}.docx"
+        docx_path = os.path.abspath(docx_filename)
         output_dir = "/tmp"
-        pdf_path = os.path.join(output_dir, f"{safe_filename_base}.pdf")
+        
+        # LibreOffice names the output PDF matching the input file's base name
+        temp_pdf_path = os.path.join(output_dir, f"temp_{safe_filename_base}.pdf")
+        final_pdf_path = os.path.join(output_dir, f"{safe_filename_base}.pdf")
         
         file.save(docx_path)
         
@@ -32,10 +37,20 @@ def convert_word_to_pdf():
         if result.returncode != 0:
             return f"LibreOffice Error: {result.stderr}", 500
         
-        if os.path.exists(pdf_path):
+        # Check if LibreOffice created the file with 'temp_' prefix
+        if os.path.exists(temp_pdf_path):
+            # Rename it to clean name
+            if os.path.exists(final_pdf_path):
+                os.remove(final_pdf_path)
+            os.rename(temp_pdf_path, final_pdf_path)
+            pdf_path = final_pdf_path
+        elif os.path.exists(final_pdf_path):
+            pdf_path = final_pdf_path
+
+        if pdf_path and os.path.exists(pdf_path):
             return send_file(pdf_path, as_attachment=True, download_name=f"{filename_base}.pdf")
         else:
-            return "PDF generation failed", 500
+            return f"PDF generation failed. LibreOffice output: {result.stdout} {result.stderr}", 500
             
     except Exception as e:
         error_details = traceback.format_exc()
