@@ -1,5 +1,2 @@
-flask
-flask-cors
-gunicorn
-cloudconvert
-requests
+google-api-python-client
+google-auth
