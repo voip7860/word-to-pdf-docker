@@ -8,8 +8,11 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# زیادہ سے زیادہ فائل سائز کی حد (مثلاً 10MB)
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+
 # CloudConvert API Key
-CLOUDCONVERT_API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNTBjMzYxNGM2M2FkM2RmYWUyMWIyNDI3YmI2MGZjMmU4MjNjOWUxZjQyOGUyNTNmNDE4NmY4MmE0ZTUwYWIxNmNhOWM4ZDczNGQ1OWMyZDgiLCJpYXQiOjE3ODk2NzAzNzEuMDUwMzA1LCJuYmYiOjE3ODk2NzAzNzEuMDUwMzA3LCJleHAiOjQ5NDUzNDM5NzEuMDQxNjc1LCJzdWIiOiI3NzAwODExNCIsInNjb3BlcyI6WyJ1c2VyLnJlYWQiLCJ0YXNrLnJlYWQiLCJ0YXNrLndyaXRlIl19.VC3egQDirvbmCSKWBqZSeNxuQxzakS49AtosMIYlb6FLc94_No4SZrs5i_VbC3kpwhHt1cpCI63ItrPEiuUsEzt_VdnsXSetyONSgFgzfikvPgjVyb3wC08dXqVEcpRiDUEpfCT0TQlbRSfCSTrwvOOI7JwuDH4Ow1JAk3F9wTsCBxRBbxStlfVUM0NkqodbvitiDaksQymGwAmUNT12wIIGWFe0vWQPz-SxEjGqrFxZDEg7heLMDWR4O6c2t2Zy1i140TB_3OSj_Lkf-XuoCsXkQc9DhlPscrsT0Efk9_qQy3SQhUCwlvMQskpezV-r7y1Na_LTNm-WUEVy96fwM20AJKZesztTszGx9KEEkSyebVzxisMHo971o7QZsliQc1AfntHS0hTCeFlB4IidvwzYrCCdMXOdDK2fiJ2ExgRxd311AZ13EuZl99v0gtEiVp8HnRIWLQ_E3YypP-tZKUE_FYsRhkxfII3PIl0Sue8qcFAt0UqyyoPbm1DIpLk5iwdTElDoZo1c9jpxo7I-FUrjxYwTQbwkARl8B-os0IZBkCGQmCfSzakK9p4usnRoCKY9mHs-p5idycUPP_P-As4YZxiE0dFkXe8L0j_AjbXXRKF8S19-GJ7kzg1o4C6TXZz_NSlnKk1YEB6APOZ0ONEW_Om7Pb_-DNF-R9uplPI"
+CLOUDCONVERT_API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNTBjMzYxNGM2M2FkM2RmYWUyMWIyNDI3YmI2MGZjMmU4MjNjOWUxZjQyOGUyNTNmNDE4NmY4MmE0ZTUwYWIxNmNhOWM4ZDczNGQ1OWMyZDgiLCJpYXQiOjE3ODk2NzAzNzEuMDUwMzA1LCJuYmYiOjE3ODk2NzAzNzEuMDUwMzA3LCJleHAiOjQ5NDUzNDM5NzEuMDQxNjc1LCJzdWIiOiI3NzAwODExNCIsInNjb3BlcyI6WyJ1c2VyLnJlYWQiLCJ0YX스크LnJlYWQiLCJ0YXNrLndyaXRlIl19.VC3egQDirvbmCSKWBqZSeNxuQxzakS49AtosMIYlb6FLc94_No4SZrs5i_VbC3kpwhHt1cpCI63ItrPEiuUsEzt_VdnsXSetyONSgFgzfikvPgjVyb3wC08dXqVEcpRiDUEpfCT0TQlbRSfCSTrwvOOI7JwuDH4Ow1JAk3F9wTsCBxRBbxStlfVUM0NkqodbvitiDaksQymGwAmUNT12wIIGWFe0vWQPz-SxEjGqrFxZDEg7heLMDWR4O6c2t2Zy1i140TB_3OSj_Lkf-XuoCsXkQc9DhlPscrsT0Efk9_qQy3SQhUCwlvMQskpezV-r7y1Na_LTNm-WUEVy96fwM20AJKZesztTszGx9KEEkSyebVzxisMHo971o7QZsliQc1AfntHS0hTCeFlB4IidvwzYrCCdMXOdDK2fiJ2ExgRxd311AZ13EuZl99v0gtEiVp8HnRIWLQ_E3YypP-tZKUE_FYsRhkxfII3PIl0Sue8qcFAt0UqyyoPbm1DIpLk5iwdTElDoZo1c9jpxo7I-FUrjxYwTQbwkARl8B-os0IZBkCGQmCfSzakK9p4usnRoCKY9mHs-p5idycUPP_P-As4YZxiE0dFkXe8L0j_AjbXXRKF8S19-GJ7kzg1o4C6TXZz_NSlnKk1YEB6APOZ0ONEW_Om7Pb_-DNF-R9uplPI"
 
 cloudconvert.configure(api_key=CLOUDCONVERT_API_KEY)
 
@@ -22,6 +25,13 @@ def convert_word_to_pdf():
             return 'No file uploaded', 400
         
         file = request.files['file']
+        if file.filename == '':
+            return 'No selected file', 400
+
+        # صرف docx فائل چیک کرنے کے لیے
+        if not file.filename.lower().endswith('.docx'):
+            return 'Only .docx files are allowed', 400
+
         filename_base = os.path.splitext(file.filename)[0]
         safe_filename_base = "".join([c if c.isalnum() else "_" for c in filename_base])
         
