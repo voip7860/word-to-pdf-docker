@@ -30,18 +30,15 @@ def convert_word_to_pdf():
         if not file.filename.lower().endswith('.docx'):
             return 'Only .docx files are allowed', 400
 
-        # فائل کے نام کو بالکل محفوظ بنانا تاکہ لیٹن-1 انکوڈنگ کا مسئلہ نہ ہو
-        safe_filename = "converted_document"
-        
-        docx_filename = f"{safe_filename}.docx"
-        pdf_filename = f"{safe_filename}.pdf"
+        docx_filename = "converted_document.docx"
+        pdf_filename = "converted_document.pdf"
         
         docx_path = os.path.join("/tmp", docx_filename)
         pdf_path = os.path.join("/tmp", pdf_filename)
         
         file.save(docx_path)
         
-        # CloudConvert Job Creation using MS Office Engine
+        # CloudConvert Job Creation
         job = cloudconvert.Job.create(payload={
             "tasks": {
                 "import-my-file": {
@@ -60,15 +57,38 @@ def convert_word_to_pdf():
             }
         })
         
+        # چیک کریں کہ آیا جاب کامیابی سے بنی ہے یا نہیں
+        if not job or 'tasks' not in job:
+            return f"CloudConvert Error: Failed to create job. Response: {job}", 500
+        
         # Upload docx file to CloudConvert
-        upload_task = [task for task in job['tasks'] if task['name'] == 'import-my-file'][0]
+        upload_task = None
+        for task in job['tasks']:
+            if task.get('name') == 'import-my-file':
+                upload_task = task
+                break
+                
+        if not upload_task:
+            return f"CloudConvert Error: 'import-my-file' task not found in job data: {job}", 500
+
         cloudconvert.Task.upload(file_name=docx_path, task=upload_task)
         
         # Wait for conversion job to complete
         job = cloudconvert.Job.wait(id=job['id'])
         
+        if not job or 'tasks' not in job:
+            return "CloudConvert Error: Job execution failed or returned invalid data.", 500
+
         # Get exported file URL and download PDF
-        export_task = [task for task in job['tasks'] if task['name'] == 'export-my-file'][0]
+        export_task = None
+        for task in job['tasks']:
+            if task.get('name') == 'export-my-file':
+                export_task = task
+                break
+
+        if not export_task or 'result' not in export_task or 'files' not in export_task['result']:
+            return "CloudConvert Error: Export task result not found.", 500
+
         file_info = export_task['result']['files'][0]
         file_url = file_info['url']
         
