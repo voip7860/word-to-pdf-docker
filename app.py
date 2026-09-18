@@ -1,4 +1,5 @@
 import os
+import requests
 import traceback
 import cloudconvert
 from flask import Flask, request, send_file
@@ -32,7 +33,7 @@ def convert_word_to_pdf():
         
         file.save(docx_path)
         
-        # Fixed CloudConvert Task syntax (import/upload)
+        # CloudConvert Job Creation using MS Office Engine
         job = cloudconvert.Job.create(payload={
             "tasks": {
                 "import-my-file": {
@@ -55,12 +56,18 @@ def convert_word_to_pdf():
         upload_task = [task for task in job['tasks'] if task['name'] == 'import-my-file'][0]
         cloudconvert.Task.upload(file_name=docx_path, task=upload_task)
         
-        # Wait for conversion to complete
-        cloudconvert.Job.wait(id=job['id'])
+        # Wait for conversion job to complete
+        job = cloudconvert.Job.wait(id=job['id'])
         
-        # Download converted PDF
+        # Get exported file URL and download PDF
         export_task = [task for task in job['tasks'] if task['name'] == 'export-my-file'][0]
-        cloudconvert.Task.download(file_name=pdf_path, task=export_task)
+        file_info = export_task['result']['files'][0]
+        file_url = file_info['url']
+        
+        # Download PDF using requests
+        res = requests.get(file_url)
+        with open(pdf_path, 'wb') as f:
+            f.write(res.content)
         
         if os.path.exists(pdf_path):
             return send_file(pdf_path, as_attachment=True, download_name=f"{filename_base}.pdf")
